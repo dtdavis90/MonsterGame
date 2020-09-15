@@ -46,11 +46,11 @@ class SurfacesCache():
 
 class Animation:
     
-
-    def __init__(self, image_names_list):
+#
+    def __init__(self, animation_image_list):
         animation_list = []
 
-        for image in image_names_list:
+        for image in animation_image_list:
             cache = SurfacesCache()
             animation_list.append(cache.get_surface(image))
 
