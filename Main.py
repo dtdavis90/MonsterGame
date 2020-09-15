@@ -5,6 +5,12 @@ pygame.init()
 window = pygame.display.set_mode((320,500))
 FLOOR_Y_POS = 0
 
+
+
+
+
+
+
 class Monster:
 
     def __init__(self, height, ):
@@ -19,16 +25,51 @@ class Monster:
         monster_rect = monster_surface.get_rect(center = (100, window.get_size()[1]-self.height - 5))
         window.blit(monster_surface, monster_rect)
 
-    # def draw_monster(self):
-    #     self.animation.next()
-    #     surface = self.animation.get()
-    #     rect = surface.get_rect .....
-    #     blit
-    #class surfacse:
 
-    #def get_surface(image):
-        #
 
+
+
+
+
+
+class SurfacesCache():
+    image_dictionary = {}
+    
+    def get_surface(self, image_name):
+        # if image_name is not found, load and add to dictionary, then return associated surface object(.png)
+        if image_name not in self.image_dictionary:
+            image_surface = pygame.image.load(f'./assets/{image_name}.png')
+            self.image_dictionary[image_name] = image_surface
+
+        return self.image_dictionary[image_name]
+
+
+class Animation:
+    
+
+    def __init__(self, image_names_list):
+        animation_list = []
+
+        for image in image_names_list:
+            cache = SurfacesCache()
+            animation_list.append(cache.get_surface(image))
+
+    def restart_animation():
+
+    def next_frame():
+
+    def get_current_surface():
+        
+
+        
+
+
+
+
+
+
+
+            
 
 
 
