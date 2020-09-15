@@ -46,7 +46,7 @@ class SurfacesCache():
 
 class Animation:
     
-#
+
     def __init__(self, animation_image_list):
         animation_list = []
 
@@ -55,6 +55,7 @@ class Animation:
             animation_list.append(cache.get_surface(image))
 
     def restart_animation():
+        comment
 
     def next_frame():
 
