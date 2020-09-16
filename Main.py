@@ -48,28 +48,35 @@ class Animation:
     
 
     def __init__(self, image_names_list):
-        animation_list = []
+        self.animation_list = []
+        self.index = 0
+        self.cache = SurfacesCache()
 
         for image in image_names_list:
-            cache = SurfacesCache()
-            animation_list.append(cache.get_surface(image))
+            self.animation_list.append(self.cache.get_surface(image))
 
-    def restart_animation():
+    def restart_animation(self):
+        self.index = 0
 
-    def next_frame():
+    def next_frame(self):
+        index = self.index
+        animation_list = self.animation_list
+        if index + 1 > len(animation_list) - 1:
+            self.restart_animation()
+        return self.animation_list[self.index]
 
-    def get_current_surface():
+    def get_current_surface(self):
+        animation_list = self.animation_list
+        index = self.index
+        cache = self.cache
+        return cache.get_surface(animation_list[index])
+
         
 
         
 
 
 
-
-
-
-
-            
 
 
 
