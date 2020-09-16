@@ -15,7 +15,7 @@ class Monster:
 
     def __init__(self, height, ):
         self.height = height
-        self.animation = Animation('a','b')
+        self.animation = Animation()
 
 
     def create_monster(self):
