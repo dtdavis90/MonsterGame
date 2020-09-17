@@ -44,6 +44,10 @@ class SurfacesCache():
         return self.image_dictionary[image_name]
 
 
+
+
+
+
 class Animation:
     
 
@@ -55,26 +59,52 @@ class Animation:
         for image in image_names_list:
             self.animation_list.append(self.cache.get_surface(image))
 
+
     def restart_animation(self):
         self.index = 0
+
 
     def next_frame(self):
         index = self.index
         animation_list = self.animation_list
+
         if index + 1 > len(animation_list) - 1:
             self.restart_animation()
-        return self.animation_list[self.index]
+        return animation_list[index]
+
 
     def get_current_surface(self):
         animation_list = self.animation_list
         index = self.index
         cache = self.cache
+
         return cache.get_surface(animation_list[index])
 
         
 
-        
 
+
+
+
+class AnimationController():
+    monster_animation_dictionary = {}
+
+    def __init__(self, animation_dictionary):
+       monster_animation_dictionary =self.monster_animation_dictionary
+
+       for animation_name in animation_dictionary:
+            animation_list = animation_dictionary[animation_name]
+            animation_instance = Animation(animation_list)
+            monster_animation_dictionary[animation_name] = animation_instance
+
+    
+    def set_animation(self, animation_name):
+        monster_animation_dictionary = self.monster_animation_dictionary
+
+        if animation_name in monster_animation_dictionary:
+            return monster_animation_dictionary[animation_name]  
+
+    
 
 
 
