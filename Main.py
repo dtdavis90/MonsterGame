@@ -32,7 +32,12 @@ class Monster:
 
 
 
+
+
+
+
 class SurfacesCache():
+
     image_dictionary = {}
     
     def get_surface(self, image_name):
@@ -50,7 +55,6 @@ class SurfacesCache():
 
 class Animation:
     
-
     def __init__(self, image_names_list):
         self.animation_list = []
         self.index = 0
@@ -65,20 +69,15 @@ class Animation:
 
 
     def next_frame(self):
-        index = self.index
-        animation_list = self.animation_list
 
-        if index + 1 > len(animation_list) - 1:
+        if self.index + 1 > len(self.animation_list) - 1:
             self.restart_animation()
-        return animation_list[index]
+        return self.animation_list[self.index]
 
 
     def get_current_surface(self):
-        animation_list = self.animation_list
-        index = self.index
-        cache = self.cache
 
-        return cache.get_surface(animation_list[index])
+        return self.cache.get_surface(self.animation_list[self.index])
 
         
 
@@ -87,15 +86,15 @@ class Animation:
 
 
 class AnimationController():
+    
     monster_animation_dictionary = {}
 
     def __init__(self, animation_dictionary):
-       monster_animation_dictionary =self.monster_animation_dictionary
 
        for animation_name in animation_dictionary:
             animation_list = animation_dictionary[animation_name]
-            animation_instance = Animation(animation_list)
-            monster_animation_dictionary[animation_name] = animation_instance
+            self.animation_instance = Animation(animation_list)
+            self.monster_animation_dictionary[animation_name] = self.animation_instance
 
     
     def set_animation(self, animation_name):
@@ -103,8 +102,18 @@ class AnimationController():
 
         if animation_name in monster_animation_dictionary:
             return monster_animation_dictionary[animation_name]  
-
+        else:
+            raise ValueError(f'Animation {animation_name} not found')
+            #TO DO -- set index of current animation to 0
+        
+    def next_frame(self):
+        # TO DO -- grab correct animation_instance
+        return self.animation_instance.next_frame()
     
+
+
+
+
 
 
 
@@ -116,8 +125,6 @@ def build_floor():
     floor_rect = floor.get_rect(center = (window.get_size()[0]/2, window.get_size()[1]-(floor.get_size()[1])/2))
     window.blit(floor, floor_rect)
     FLOOR_Y_POS = floor.get_size()[1]
-
-
 
 
 
