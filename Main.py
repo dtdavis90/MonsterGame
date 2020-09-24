@@ -33,7 +33,7 @@ class Monster:
 
 
     def create_monster(self):
-        self.animation_controller.set_animation('Dying')
+        self.animation_controller.set_animation('Jumping')
         
         # monster_surface = pygame.image.load('./assets/monster.png')
         # monster_surface = surfaces.get_surface('./assets/monster.png')
@@ -117,10 +117,10 @@ class Animation:
 
 
     def next_frame(self):
-        
         self.index += 1
         if self.index > len(self.animation_list) - 1:
             self.restart_animation()
+        
         return self.animation_list[self.index]
 
 
@@ -150,17 +150,18 @@ class AnimationController():
 
     
     def set_animation(self, animation_name):
-        monster_animation_dictionary = self.monster_animation_dictionary
 
-        if animation_name in monster_animation_dictionary:
-            self.current_animation =  monster_animation_dictionary[animation_name]  
+        if animation_name in self.monster_animation_dictionary:
+            self.current_animation =  self.monster_animation_dictionary[animation_name]  
+
         else:
             raise ValueError(f'Animation {animation_name} not found')
             #TO DO -- set index of current animation to 0
         
     def next_frame(self):
         # TO DO -- grab correct animation_instance
-        return self.animation_instance.next_frame()
+        
+        return self.current_animation.next_frame()
 
     
 
