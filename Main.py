@@ -32,8 +32,8 @@ class Monster:
         
 
 
-    def create_monster(self):
-        self.animation_controller.set_animation('Jumping')
+    def animate(self, animation_name):
+        self.animation_controller.set_animation(animation_name)
         
         # monster_surface = pygame.image.load('./assets/monster.png')
         # monster_surface = surfaces.get_surface('./assets/monster.png')
@@ -71,7 +71,7 @@ class SurfacesCacheSingleton():
             raise Exception("Failed to make multiple instances of SurfacesCacheSingleton")
         else:
             SurfacesCacheSingleton._instance = self
-        print(f'instance object: {self._instance}')
+        
 
     @staticmethod
     def get_cache_instance():
@@ -138,13 +138,16 @@ class AnimationController():
     
     def __init__(self, animation_dictionary):
         self.monster_animation_dictionary = animation_dictionary
-        self.current_animation = []
+        self.current_animation_list = []
+        self.current_animation_name = ""
+        self.key_list = []
 
         for animation_name in animation_dictionary:
             animation_list = animation_dictionary[animation_name]
             self.animation_instance = Animation(animation_list)
             self.monster_animation_dictionary[animation_name] = self.animation_instance
-            
+        
+        self.key_list = list(self.monster_animation_dictionary)
         
         
 
@@ -152,17 +155,23 @@ class AnimationController():
     def set_animation(self, animation_name):
 
         if animation_name in self.monster_animation_dictionary:
-            self.current_animation =  self.monster_animation_dictionary[animation_name]  
+            self.current_animation_list =  self.monster_animation_dictionary[animation_name]
+            self.current_animation_name = animation_name  
 
         else:
             raise ValueError(f'Animation {animation_name} not found')
-            #TO DO -- set index of current animation to 0
+            
         
     def next_frame(self):
-        # TO DO -- grab correct animation_instance
         
-        return self.current_animation.next_frame()
+        return self.current_animation_list.next_frame()
 
+    def next_animation(self):
+        index = self.key_list.index(self.current_animation_name)
+        if index >= len(self.key_list) - 1:
+            index = -1
+        self.current_animation_list = self.monster_animation_dictionary[self.key_list[index+1]]
+        self.current_animation_name = self.key_list[index+1]
     
 
     
@@ -180,7 +189,7 @@ def build_floor():
 
 def key_control(event):
     if event.key == pygame.K_w:
-        return "Standing"
+        monster.animation_controller.next_animation()
 
 
 
@@ -200,13 +209,15 @@ while True:
     
     if not is_created:
         monster = Monster(FLOOR_Y_POS, animation_dictionary)
-        monster.create_monster()
+        monster.animate('Standing')
         is_created = True
         
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
-            pass
-            #monster.animation_controller.set_animation(key_control(event))
+            monster.animation_controller.next_animation()
+           # key_control(event)
+
+           
             
                 
 
