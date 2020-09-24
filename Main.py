@@ -4,7 +4,7 @@ pygame.init()
 
 window = pygame.display.set_mode((320,500))
 FLOOR_Y_POS = 0
-is_alive = False
+is_created = False
 fps = 5
 clock = pygame.time.Clock()
 
@@ -14,7 +14,10 @@ animation_dictionary = {'Attacking': ['monster_attacking1', 'monster_attacking2'
                          'monster_dead3', 'monster_dead4', 'monster_dead5', 'monster_dead6', 'monster_dead7',
                           'monster_dead8', 'monster_dead9', 'monster_dead10', 'monster_dead11', 'monster_dead12',
                           'monster_dead13', 'monster_dead14', 'monster_dead15', 'monster_dead16', 'monster_dead17', 
-                          'monster_dead18', 'monster_dead19', 'monster_dead20', 'monster_dead21']}
+                          'monster_dead18', 'monster_dead19', 'monster_dead20', 'monster_dead21',], 'Jumping' : ['monster_jumping1',
+                           'monster_jumping1', 'monster_jumping3', 'monster_jumping4', 'monster_jumping5', 'monster_jumping6',
+                           'monster_jumping7', 'monster_jumping8', 'monster_jumping9', 'monster_jumping10', 'monster_jumping11',
+                           'monster_jumping12', 'monster_jumping13'], 'Standing' : ['monster_still1', 'monster_still2']}
 
 
 
@@ -30,7 +33,7 @@ class Monster:
 
 
     def create_monster(self):
-        print("test")
+        self.animation_controller.set_animation('Dying')
         
         # monster_surface = pygame.image.load('./assets/monster.png')
         # monster_surface = surfaces.get_surface('./assets/monster.png')
@@ -43,7 +46,7 @@ class Monster:
         monster_surface = self.animation_controller.next_frame()
         monster_rect = monster_surface.get_rect(center = (100, (int(window.get_size()[1]/2))-self.height))
         window.blit(monster_surface, monster_rect)
-        # surface = SurfacesCache()
+        # surface = SurfacesCacheSingleton()
         # monster_surface = surface.get_surface('./MonsterGame/assets/default_monster.png')
         # monster_rect = monster_surface.get_rect(center = (100, (window.get_size()[1]/2)-self.height ))
         # window.blit(monster_surface, monster_rect)
@@ -58,19 +61,37 @@ class Monster:
 
 
 
-class SurfacesCache():
+class SurfacesCacheSingleton():
 
     image_dictionary = {}
+    _instance = None
+
+    def __init__(self):
+        if SurfacesCacheSingleton._instance is not None:
+            raise Exception("Failed to make multiple instances of SurfacesCacheSingleton")
+        else:
+            SurfacesCacheSingleton._instance = self
+        print(f'instance object: {self._instance}')
+
+    @staticmethod
+    def get_cache_instance():
+        if SurfacesCacheSingleton._instance is None:
+            SurfacesCacheSingleton()
+        return SurfacesCacheSingleton._instance
     
     def get_surface(self, image_name):
         # if image_name is not found, load and add to dictionary, then return associated surface object(.png)
         if image_name not in self.image_dictionary:
-            print(f'image_name:{image_name}')
             image_surface = pygame.image.load(f'./MonsterGame/assets/{image_name}.png')
             self.image_dictionary[image_name] = image_surface
             #f'./assets/{image_name}.png'
 
         return self.image_dictionary[image_name]
+
+    
+   
+    
+    
 
 
 
@@ -80,23 +101,26 @@ class SurfacesCache():
 class Animation:
     
     def __init__(self, image_names_list):
+
         self.animation_list = []
         self.index = 0
-        self.cache = SurfacesCache()
+        self.cache = SurfacesCacheSingleton.get_cache_instance()
 
         for image in image_names_list:
             self.animation_list.append(self.cache.get_surface(image))
+            
 
 
     def restart_animation(self):
+
         self.index = 0
 
 
     def next_frame(self):
-
-        if self.index + 1 > len(self.animation_list) - 1:
-            self.restart_animation()
+        
         self.index += 1
+        if self.index > len(self.animation_list) - 1:
+            self.restart_animation()
         return self.animation_list[self.index]
 
 
@@ -120,6 +144,7 @@ class AnimationController():
             animation_list = animation_dictionary[animation_name]
             self.animation_instance = Animation(animation_list)
             self.monster_animation_dictionary[animation_name] = self.animation_instance
+            
         
         
 
@@ -143,12 +168,6 @@ class AnimationController():
 
 
 
-
-
-
-
-
-
 def build_floor():
     global FLOOR_Y_POS
     floor = pygame.image.load('./assets/base.png')
@@ -158,7 +177,9 @@ def build_floor():
 
 
 
-
+def key_control(event):
+    if event.key == pygame.K_w:
+        return "Standing"
 
 
 
@@ -167,18 +188,27 @@ def build_floor():
 while True:
    
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit(0)
+    # for event in pygame.event.get():
+    #     if event.type == pygame.QUIT:
+    #         pygame.quit()
+    #         sys.exit(0)
+        
 
 
     
     
-    if not is_alive:
+    if not is_created:
         monster = Monster(FLOOR_Y_POS, animation_dictionary)
-        is_alive = True
-        monster.animation_controller.set_animation('Dying')
+        monster.create_monster()
+        is_created = True
+        
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            pass
+            #monster.animation_controller.set_animation(key_control(event))
+            
+                
+
 
     monster.draw()
     pygame.display.update()
