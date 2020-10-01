@@ -17,7 +17,10 @@ animation_dictionary = {'Attacking': ['monster_attacking1', 'monster_attacking2'
                           'monster_dead18', 'monster_dead19', 'monster_dead20', 'monster_dead21',], 'Jumping' : ['monster_jumping1',
                            'monster_jumping1', 'monster_jumping3', 'monster_jumping4', 'monster_jumping5', 'monster_jumping6',
                            'monster_jumping7', 'monster_jumping8', 'monster_jumping9', 'monster_jumping10', 'monster_jumping11',
-                           'monster_jumping12', 'monster_jumping13'], 'Standing' : ['monster_still1', 'monster_still2']}
+                           'monster_jumping12', 'monster_jumping13'], 'Standing' : ['monster_still1', 'monster_still2'],
+                            'Damage' : ['monster_taking_damage1', 'monster_taking_damage2', 'monster_taking_damage3',
+                             'monster_taking_damage4'], 'Walking' : ['monster_walking1', 'monster_walking2', 
+                           'monster_walking4', 'monster_walking5', 'monster_walking6']}
 
 
 
@@ -25,9 +28,9 @@ animation_dictionary = {'Attacking': ['monster_attacking1', 'monster_attacking2'
 class Monster:
 
     def __init__(self, height, animation_dictionary):
+        #monster should not be initialized with this dictionary, causes issues when creating a second monster with same dictionary
         self.height = height
         self.animation_dictionary = animation_dictionary
-        #self.animation = Animation()
         self.animation_controller = AnimationController(self.animation_dictionary)
         
 
@@ -35,10 +38,7 @@ class Monster:
     def animate(self, animation_name):
         self.animation_controller.set_animation(animation_name)
         
-        # monster_surface = pygame.image.load('./assets/monster.png')
-        # monster_surface = surfaces.get_surface('./assets/monster.png')
-        # monster_rect = monster_surface.get_rect(center = (100, window.get_size()[1]-self.height - 5))
-        # window.blit(monster_surface, monster_rect)
+
 
     def draw(self):
         
@@ -46,18 +46,8 @@ class Monster:
         monster_surface = self.animation_controller.next_frame()
         monster_rect = monster_surface.get_rect(center = (100, (int(window.get_size()[1]/2))-self.height))
         window.blit(monster_surface, monster_rect)
-        # surface = SurfacesCacheSingleton()
-        # monster_surface = surface.get_surface('./MonsterGame/assets/default_monster.png')
-        # monster_rect = monster_surface.get_rect(center = (100, (window.get_size()[1]/2)-self.height ))
-        # window.blit(monster_surface, monster_rect)
+
         
-
-
-
-
-
-
-
 
 
 
@@ -90,13 +80,6 @@ class SurfacesCacheSingleton():
 
     
    
-    
-    
-
-
-
-
-
 
 class Animation:
     
@@ -130,10 +113,6 @@ class Animation:
 
         
 
-
-
-
-
 class AnimationController():
     
     def __init__(self, animation_dictionary):
@@ -163,7 +142,7 @@ class AnimationController():
             
         
     def next_frame(self):
-        
+        #current_animation_list is an Animation object
         return self.current_animation_list.next_frame()
 
     def next_animation(self):
@@ -172,56 +151,61 @@ class AnimationController():
             index = -1
         self.current_animation_list = self.monster_animation_dictionary[self.key_list[index+1]]
         self.current_animation_name = self.key_list[index+1]
+
+    def key_control(self, event):
+        if event.key == pygame.K_w:
+            self.next_animation()
     
 
     
 
 
+class Scene:
 
-def build_floor():
-    global FLOOR_Y_POS
-    floor = pygame.image.load('./assets/base.png')
-    floor_rect = floor.get_rect(center = (window.get_size()[0]/2, window.get_size()[1]-(floor.get_size()[1])/2))
-    window.blit(floor, floor_rect)
-    FLOOR_Y_POS = floor.get_size()[1]
+    def __init__(self):
+        pass
 
 
+    def build_floor(self):
+        floor = pygame.image.load('./MonsterGame/assets/base.png')
+        floor_rect = floor.get_rect(center = (window.get_size()[0]/2, window.get_size()[1]-(floor.get_size()[1])/2))
+        window.blit(floor, floor_rect)
+        FLOOR_Y_POS = floor.get_size()[1]
 
-def key_control(event):
-    if event.key == pygame.K_w:
-        monster.animation_controller.next_animation()
+
+
+
+
+
 
 
 
 
 
 while True:
-   
-
-    # for event in pygame.event.get():
-    #     if event.type == pygame.QUIT:
-    #         pygame.quit()
-    #         sys.exit(0)
-        
-
-
     
     
     if not is_created:
         monster = Monster(FLOOR_Y_POS, animation_dictionary)
         monster.animate('Standing')
+        # monster2 = Monster(FLOOR_Y_POS, animation_dictionary)
+        # monster2.animate('Walking')
         is_created = True
         
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
-            monster.animation_controller.next_animation()
+            monster.animation_controller.key_control(event)
            # key_control(event)
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit(0)
 
            
             
                 
 
-
+    #build_floor()
     monster.draw()
+    #monster2.draw()
     pygame.display.update()
     clock.tick(fps)
