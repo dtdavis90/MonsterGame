@@ -1,5 +1,7 @@
+import abc
 import pygame
 import sys
+
 pygame.init()
 
 window = pygame.display.set_mode((320,500))
@@ -48,8 +50,18 @@ class Monster:
         window.blit(monster_surface, monster_rect)
 
         
+class Animatable(metaclass=abc.ABCMeta):
 
-
+    def set_animation(self):
+        pass
+    def next_frame(self):
+        pass
+    def next_animation(self):
+        pass
+    def key_control(self):
+        pass
+    def test_fail(self):
+        pass
 
 class SurfacesCacheSingleton():
 
@@ -113,7 +125,7 @@ class Animation:
 
         
 
-class AnimationController():
+class AnimationController(Animatable):
     
     def __init__(self, animation_dictionary):
         self.monster_animation_dictionary = animation_dictionary
@@ -136,11 +148,9 @@ class AnimationController():
         if animation_name in self.monster_animation_dictionary:
             self.current_animation_list =  self.monster_animation_dictionary[animation_name]
             self.current_animation_name = animation_name  
-
         else:
             raise ValueError(f'Animation {animation_name} not found')
-            
-        
+              
     def next_frame(self):
         #current_animation_list is an Animation object
         return self.current_animation_list.next_frame()
@@ -209,3 +219,4 @@ while True:
     #monster2.draw()
     pygame.display.update()
     clock.tick(fps)
+    print(issubclass(AnimationController, Animatable))
