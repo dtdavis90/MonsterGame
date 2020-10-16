@@ -1,6 +1,8 @@
-import abc
+
 import pygame
 import sys
+from monster import *
+
 
 pygame.init()
 
@@ -27,147 +29,7 @@ animation_dictionary = {'Attacking': ['monster_attacking1', 'monster_attacking2'
 
 
 
-class Monster:
 
-    def __init__(self, height, animation_dictionary):
-        #monster should not be initialized with this dictionary, causes issues when creating a second monster with same dictionary
-        self.height = height
-        self.animation_dictionary = animation_dictionary
-        self.animation_controller = AnimationController(self.animation_dictionary)
-        
-
-
-    def animate(self, animation_name):
-        self.animation_controller.set_animation(animation_name)
-        
-
-
-    def draw(self):
-        
-        
-        monster_surface = self.animation_controller.next_frame()
-        monster_rect = monster_surface.get_rect(center = (100, (int(window.get_size()[1]/2))-self.height))
-        window.blit(monster_surface, monster_rect)
-
-        
-class Animatable(metaclass=abc.ABCMeta):
-
-    def set_animation(self):
-        pass
-    def next_frame(self):
-        pass
-    def next_animation(self):
-        pass
-    def key_control(self):
-        pass
-    def test_fail(self):
-        pass
-
-class SurfacesCacheSingleton():
-
-    image_dictionary = {}
-    _instance = None
-
-    def __init__(self):
-        if SurfacesCacheSingleton._instance is not None:
-            raise Exception("Failed to make multiple instances of SurfacesCacheSingleton")
-        else:
-            SurfacesCacheSingleton._instance = self
-        
-
-    @staticmethod
-    def get_cache_instance():
-        if SurfacesCacheSingleton._instance is None:
-            SurfacesCacheSingleton()
-        return SurfacesCacheSingleton._instance
-    
-    def get_surface(self, image_name):
-        # if image_name is not found, load and add to dictionary, then return associated surface object(.png)
-        if image_name not in self.image_dictionary:
-            image_surface = pygame.image.load(f'./MonsterGame/assets/{image_name}.png')
-            self.image_dictionary[image_name] = image_surface
-            #f'./assets/{image_name}.png'
-
-        return self.image_dictionary[image_name]
-
-    
-   
-
-class Animation:
-    
-    def __init__(self, image_names_list):
-
-        self.animation_list = []
-        self.index = 0
-        self.cache = SurfacesCacheSingleton.get_cache_instance()
-
-        for image in image_names_list:
-            self.animation_list.append(self.cache.get_surface(image))
-            
-
-
-    def restart_animation(self):
-
-        self.index = 0
-
-
-    def next_frame(self):
-        self.index += 1
-        if self.index > len(self.animation_list) - 1:
-            self.restart_animation()
-        
-        return self.animation_list[self.index]
-
-
-    def get_current_surface(self):
-
-        return self.cache.get_surface(self.animation_list[self.index])
-
-        
-
-class AnimationController(Animatable):
-    
-    def __init__(self, animation_dictionary):
-        self.monster_animation_dictionary = animation_dictionary
-        self.current_animation_list = []
-        self.current_animation_name = ""
-        self.key_list = []
-
-        for animation_name in animation_dictionary:
-            animation_list = animation_dictionary[animation_name]
-            self.animation_instance = Animation(animation_list)
-            self.monster_animation_dictionary[animation_name] = self.animation_instance
-        
-        self.key_list = list(self.monster_animation_dictionary)
-        
-        
-
-    
-    def set_animation(self, animation_name):
-
-        if animation_name in self.monster_animation_dictionary:
-            self.current_animation_list =  self.monster_animation_dictionary[animation_name]
-            self.current_animation_name = animation_name  
-        else:
-            raise ValueError(f'Animation {animation_name} not found')
-              
-    def next_frame(self):
-        #current_animation_list is an Animation object
-        return self.current_animation_list.next_frame()
-
-    def next_animation(self):
-        index = self.key_list.index(self.current_animation_name)
-        if index >= len(self.key_list) - 1:
-            index = -1
-        self.current_animation_list = self.monster_animation_dictionary[self.key_list[index+1]]
-        self.current_animation_name = self.key_list[index+1]
-
-    def key_control(self, event):
-        if event.key == pygame.K_w:
-            self.next_animation()
-    
-
-    
 
 
 class Scene:
@@ -198,8 +60,8 @@ while True:
     if not is_created:
         monster = Monster(FLOOR_Y_POS, animation_dictionary)
         monster.animate('Standing')
-        # monster2 = Monster(FLOOR_Y_POS, animation_dictionary)
-        # monster2.animate('Walking')
+        monster2 = Monster(FLOOR_Y_POS, animation_dictionary)
+        monster2.animate('Walking')
         is_created = True
         
     for event in pygame.event.get():
@@ -213,10 +75,6 @@ while True:
            
             
                 
-
-    #build_floor()
     monster.draw()
-    #monster2.draw()
     pygame.display.update()
     clock.tick(fps)
-    print(issubclass(AnimationController, Animatable))
